@@ -443,9 +443,60 @@
   }
 
   :focus-visible{ outline:2px solid var(--gold); outline-offset:3px; }
+
+  /* ---------- in-app browser warning banner ---------- */
+  .iab-banner{
+    position:fixed;
+    top:0; left:0; right:0;
+    z-index:100;
+    display:none;
+    align-items:center;
+    gap:10px;
+    padding:11px 14px;
+    background:linear-gradient(90deg, #2a1a13, #1c1220);
+    border-bottom:1px solid rgba(255,182,72,0.35);
+    box-shadow:0 4px 18px rgba(0,0,0,0.5);
+    font-size:13.5px;
+    line-height:1.4;
+  }
+  .iab-banner.show{ display:flex; }
+  .iab-banner .iab-icon{
+    flex:none;
+    width:26px;height:26px;
+    border-radius:50%;
+    background:var(--ember);
+    display:flex;align-items:center;justify-content:center;
+    font-weight:700;
+    font-size:14px;
+    color:#1c0e0c;
+  }
+  .iab-banner .iab-text{ flex:1; color:var(--cream); }
+  .iab-banner .iab-text b{ color:var(--gold); }
+  .iab-banner .iab-close{
+    flex:none;
+    width:26px;height:26px;
+    border-radius:50%;
+    border:1px solid rgba(246,237,224,0.25);
+    background:transparent;
+    color:var(--cream-dim);
+    font-size:16px;
+    line-height:1;
+    cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .iab-banner .iab-close:hover{ background:rgba(246,237,224,0.1); }
+  @media (max-width:640px){
+    .iab-banner{ font-size:12.5px; padding:10px 12px; }
+  }
 </style>
 </head>
 <body>
+
+<div class="iab-banner" id="iabBanner">
+  <span class="iab-icon">!</span>
+  <span class="iab-text"><b>Music won't play in this app's browser.</b> Tap <b>⋮</b> or <b>⋯</b> above and choose "Open in Browser" (Chrome/Safari) for the player and horn to work.</span>
+  <button class="iab-close" id="iabClose" aria-label="Dismiss">&times;</button>
+</div>
 
 <div class="stage">
 
@@ -476,8 +527,6 @@
           <option value="gulmi">Kathmandu — Gulmi</option>
           <option value="parbat">Kathmandu — Parbat</option>
           <option value="syangja">Kathmandu — Syangja</option>
-          <option value="syangja">Butwal — Arghakhanchi</option>
-          <option value="syangja">Butwal — Syangja</option>
         </select>
       </div>
     </div>
@@ -528,6 +577,19 @@
 <div id="yt-horn"></div>
 
 <script>
+  // ---------- in-app browser detection ----------
+  (function(){
+    const ua = navigator.userAgent || '';
+    const isInApp = /Instagram|FBAN|FBAV|FB_IAB|Line\/|TikTok|MicroMessenger|Twitter/i.test(ua);
+    if(isInApp){
+      const banner = document.getElementById('iabBanner');
+      banner.classList.add('show');
+      document.getElementById('iabClose').addEventListener('click', ()=>{
+        banner.classList.remove('show');
+      });
+    }
+  })();
+
   // ---------- destination selector ----------
   (function(){
     const sel = document.getElementById('destSelect');
